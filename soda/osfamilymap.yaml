@@ -1,0 +1,88 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+#
+# Setup variables using grains['os_family'] based logic.
+# You just need to add the key:values for an `os_family` that differ
+# from `defaults.yaml`.
+# Only add an `os_family` which is/will be supported by the formula
+#
+# If you do not need to provide defaults via the `os_family` grain,
+# you will need to provide at least an empty dict in this file, e.g.
+# osfamilymap: {}
+---
+Arch:
+  pkg:
+    deps:
+      - python-pip
+      - python2-pip     ##see https://github.com/saltstack/salt/issues/48632
+      - thin-provisioning-tools
+
+Debian:
+  pkg:
+    deps:
+      - python-pip
+      - librados-dev
+      - librbd-dev
+      - libradosstriper-dev
+      - gcc
+      - make
+      - dos2unix
+      - docker-compose
+      - nodejs
+      - npm
+      - thin-provisioning-tools
+      - libffi-dev
+  systemd:
+    dir: /usr/lib/systemd/system
+
+RedHat:
+  pkg:
+    pips:
+      - python-brick-cinderclient-ext
+      - python-cinderclient
+    deps:
+      - python2-pip
+      - python2-click
+      - python-tox
+      - librados-devel     # requires ceph.repo, obsoletes librados2
+      - librbd-devel       # obsoletes librbd1
+      - docker-compose
+      - device-mapper-persistent-data
+      - python-setuptools
+      - lvm2
+      - gcc
+      - make
+      - dos2unix
+      - nodejs
+      - net-tools
+      - npm
+      - libffi-devel
+      - bind-utils
+      # kdump
+      # https://centos7.iuscommunity.org/ius-release.rpm
+  makefile:
+    platform: 'centos:7'
+
+Suse:
+  pkgs:
+    - python3-pip
+    - librados2
+    - librados-devel
+    - librbd-devel
+    - gcc
+    - make
+    - docker-compose
+    - nodejs8
+    - npm8
+    - thin-provisioning-tools
+    - libffi7
+    - python3-setuptools
+  makefile:
+    platform: 'centos:7'
+
+FreeBSD:
+  dir:
+    salt:
+      states: /usr/local/salt/base
+      pillars: /usr/local/salt/pillar
+      formula: /usr/local/salt/formula

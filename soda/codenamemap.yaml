@@ -1,0 +1,10 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+---
+CentOS Linux 7 (Core):
+  pkg:
+    deps:
+      - yum-plugin-versionlock
+      - python2-pip
+      # python-docker-py https://github.com/saltstack/salt/issues/58920
+      - rpmdevtools

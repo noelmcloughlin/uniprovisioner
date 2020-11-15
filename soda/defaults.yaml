@@ -1,0 +1,88 @@
+soda:
+  universe:
+    wanted:
+      - soda
+    supported:
+      - soda
+      - gaia
+      - idsa
+      - cncf
+  space:
+    wanted:
+      - all
+    supported:
+      - energy
+      - health
+      - industry4.0/sme
+      - agriculture
+      - mobility
+      - publicsector
+      - smartliving
+      - finance
+  focus:
+    wanted:
+      - all
+    supported:
+      - mobility
+      - protection
+      - lifecycle
+      - platform
+      - cloudnative
+      - governance
+      - orchestration
+      - energy
+  project:
+    wanted:
+      - default   # all
+    supported:
+      - controller
+      - dock
+      - nbp
+      - multicloud
+      - delfin         # sim
+      - orchestration
+      - anomaly
+      - dashboard
+      - docs
+      - examples
+  pkg: {}
+
+  controller: {}
+  dock: {}
+  nbp: {}
+  multicloud: {}
+  delfin: {}
+  orchestration: {}
+  anomaly: {}
+  dashboard: {}
+  docs: {}
+  examples: {}
+
+  dir:
+    base: /opt
+    etc: /etc
+    log: /var/log/soda
+    tmp: /tmp/universe/soda
+
+  retry_option:
+    attempts: 3
+    until: true
+    interval: 60
+    splay: 10
+
+  systemd:
+    dir: /usr/lib/systemd/system
+    conf:
+      Type: forking
+      LimitFSIZE: infinity
+      LimitCPU: infinity
+      LimitAS: infinity
+      LimitNOFILE: 64000
+      LimitNPROC: 64000
+      LimitMEMLOCK: infinity
+      TasksMax: infinity
+      TasksAccounting: false
+
+  dir: '/'
+  makefile:
+    platform: 'debian:stretch'

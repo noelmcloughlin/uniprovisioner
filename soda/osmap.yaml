@@ -1,0 +1,52 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+---
+rootuser: root
+{%- if salt is defined and grains is defined %}
+    {%- if grains.os == 'MacOS' %}
+        {%- set rootuser = salt['cmd.run']("stat -f '%Su' /dev/console") %}
+        {%- set rootgroup = salt['cmd.run']("stat -f '%Sg' /dev/console") %}
+    {%- elif grains.os == 'Windows' %}
+        {%- set rootuser = salt['cmd.run']("id -un") %}
+    {%- endif %}
+{%- endif %}
+
+MacOS:
+  user:
+    root: {{ rootuser | d('') }}
+
+Windows:
+  div: '\'
+  dir:
+    base: C:\\soda
+    etc: C:\\soda\src\libs
+    log: C:\\soda\log
+    tmp: C:\\temp\soda
+    salt:
+      states: C:\salt\srv\salt
+      pillars: C:\salt\srv\pillar
+      formula: C:\salt\srv\salt\formula
+  user:
+    root: {{ rootuser | d('') }}
+
+FreeBSD:
+  # https://reviews.freebsd.org/D21570
+  pkg:
+    deps:
+      - devel/py-pip
+
+Centos:
+  pkg:
+    deps:
+      - procps
+      - yum-utils
+
+Fedora:
+  pkg:
+    deps:
+      - selinux-policy-minimum
+      - python3-dnf-plugin-versionlock
+
+Ubuntu:
+  makefile:
+    platform: 'ubuntu:xenial'
