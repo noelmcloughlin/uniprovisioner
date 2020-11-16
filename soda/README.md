@@ -1,2 +1,0 @@
-# uniprovisioner
-Universal Provisioner

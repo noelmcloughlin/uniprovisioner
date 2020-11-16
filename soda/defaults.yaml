@@ -3,10 +3,10 @@ soda:
     wanted:
       - soda
     supported:
-      - soda
-      - gaia
-      - idsa
-      - cncf
+      - soda   # SODA Foundation
+      - gaia   # GAIA-X, Euopean Data sovereignty
+      - idsa   # IDSA, International Data Spaces Association
+      - cncf   # CNCF, Cloud Native Computing Foundation
   space:
     wanted:
       - all
@@ -19,9 +19,10 @@ soda:
       - publicsector
       - smartliving
       - finance
+
   focus:
     wanted:
-      - all
+      - default    # focus (all)
     supported:
       - mobility
       - protection
@@ -33,7 +34,7 @@ soda:
       - energy
   project:
     wanted:
-      - default   # all
+      - default   # focus (all)
     supported:
       - controller
       - dock
@@ -46,7 +47,6 @@ soda:
       - docs
       - examples
   pkg: {}
-
   controller: {}
   dock: {}
   nbp: {}
