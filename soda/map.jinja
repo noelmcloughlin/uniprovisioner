@@ -1,7 +1,12 @@
 ###  soda/map.jinja ###
-### exported dicts: soda, driver, docker, firewalld, golang, etcd, ceph ###
+### This file will export python dicts for use in Infra-as-Code
+### i.e. soda (model), driver, docker, firewalld, golang, etcd, ceph ###
 
-#OpenSDS: import formula default dicts
+# SODA consists of many projects each with a YAML file.
+# Each project can have its own sub-directory in SODA installer
+# Each subdirectory can contain YAML defaults (i.e. Delfin defaults).
+# with JINJA2 language we can import these a PYTHON DICT
+
 {% import_yaml "soda/yaml/defaults.yaml" as defaults %}
 {% import_yaml "soda/yaml/osfamilymap.yaml" as osfamilymap %}
 {% import_yaml "soda/yaml/osmap.yaml" as osmap %}
@@ -9,49 +14,54 @@
 {% import_yaml "soda/hotpot/defaults.yaml" as hotpot %}
 {% import_yaml "soda/auth/defaults.yaml" as auth %}
 {% import_yaml "soda/gelato/defaults.yaml" as gelato %}
-{% import_yaml "soda/backend/defaults.yaml" as backend %}
-{% import_yaml "soda/backend/block/defaults.yaml" as block %}
 {% import_yaml "soda/dashboard/defaults.yaml" as dashboard %}
 {% import_yaml "soda/sushi/defaults.yaml" as sushi %}
-{% import_yaml "soda/sushi/plugin/defaults.yaml" as pluggy %}
 {% import_yaml "soda/dock/defaults.yaml" as dock %}
 
-#OpenSDS: merge with pillar data
-{%- set soda = salt['grains.filter_by'](
-     defaults, merge=salt['grains.filter_by'](
-        database, merge=salt['grains.filter_by'](
-           hotpot, merge=salt['grains.filter_by'](
-              auth, merge=salt['grains.filter_by'](
-                 gelato, merge=salt['grains.filter_by'](
-                    backend, merge=salt['grains.filter_by'](
-                       block, merge=salt['grains.filter_by'](
-                          dashboard, merge=salt['grains.filter_by'](
-                             sushi, merge=salt['grains.filter_by'](
-                                pluggy, merge=salt['grains.filter_by'](
-                                   dock, merge=salt['grains.filter_by'](
-                                      osfamilymap, grain='os_family', merge=salt['grains.filter_by'](
-                                         osmap, grain='os', merge=salt['pillar.get']('soda', {}),
-                                         base='soda',),
-                                      base='soda',),
-                                   base='soda',),
-                                base='soda',),
-                             base='soda',),
-                          base='soda',),
-                       base='soda',),
-                    base='soda',),
-                 base='soda',),
-              base='soda',),
-           base='soda',),
-        base='soda',),
-     base='soda',)
-%}
+{%- if salt is defined %}
+    {# Salt loves dictionaries and can merge them #}
+    {%- set soda = salt['grains.filter_by'](
+         defaults, merge=salt['grains.filter_by'](
+            database, merge=salt['grains.filter_by'](
+               hotpot, merge=salt['grains.filter_by'](
+                  auth, merge=salt['grains.filter_by'](
+                     gelato, merge=salt['grains.filter_by'](
+                        backend, merge=salt['grains.filter_by'](
+                           block, merge=salt['grains.filter_by'](
+                              dashboard, merge=salt['grains.filter_by'](
+                                 sushi, merge=salt['grains.filter_by'](
+                                    pluggy, merge=salt['grains.filter_by'](
+                                       dock, merge=salt['grains.filter_by'](
+                                          osfamilymap, grain='os_family', merge=salt['grains.filter_by'](
+                                             osmap, grain='os', merge=salt['pillar.get']('soda', {}),
+                                             base='soda',),
+                                          base='soda',),
+                                       base='soda',),
+                                    base='soda',),
+                                 base='soda',),
+                              base='soda',),
+                           base='soda',),
+                        base='soda',),
+                     base='soda',),
+                  base='soda',),
+               base='soda',),
+            base='soda',),
+         base='soda',)
+    %}
+{%- elif ansible is defined %}
+    {# I need to study how to do this with Ansible #}
+{%- endif %}
 
-#################################################################
-# To access 3rd-party salt formula defaults (in soda-formula)
-# we import their defaults.yaml file & then merge our pillar data
-# ontop. The resulting DICT is accessible in this formula.
-# Here is the method illustrated ....
 ############################################################
+# In the world of configuration management and python
+# Any YAML file can be imported as Python Dict.
+# Consider the YAML file as some external Model.
+#
+# Hint: We import model for any CNCF component into SODA
+#       installer namespace and reuse in our installer.
+#
+############################################################
+{# Assume we have following external yamls #}
 {% import_yaml "firewalld/defaults.yaml" as firewalld %}
 {% import_yaml "golang/defaults.yaml" as golang %}
 {% import_yaml "etcd/defaults.yaml" as etcd %}
@@ -61,11 +71,26 @@
 {% import_yaml "packages/defaults.yaml" as packages %}
 {%- set resolver = {} %}
 
-{%- set firewalld=salt['grains.filter_by'](firewalld, merge=salt['pillar.get']('firewalld',{}),base='firewalld') %}
-{%- set golang = salt['grains.filter_by']( golang, merge=salt['pillar.get']('golang', {}), base='golang') %}
-{%- set etcd = salt['grains.filter_by']( etcd, merge=salt['pillar.get']('etcd', {}), base='etcd') %}
-{%- set ceph = salt['grains.filter_by']( ceph, merge=salt['pillar.get']('ceph', {}), base='ceph') %}
-{%- set docker = salt['grains.filter_by']( docker, merge=salt['pillar.get']('docker', {}), base='docker') %}
-{%- set devstack = salt['grains.filter_by']( devstack, merge=salt['pillar.get']('devstack', {}), base='devstack')%}
-{%- set packages = salt['grains.filter_by']( packages, merge=salt['pillar.get']('packages', {}), base='packages')%}
-{%- set resolver = salt['grains.filter_by']( resolver, merge=salt['pillar.get']('resolver', {}), base='resolver')%}
+############################################################
+# We can look inside these yamls to see "what is structure".
+# Then we can create 2nd yaml file with "our overrides".
+# Finally we can merge our YAML file into upstream YAML
+# To generate custom Python dictionary for Salt.
+############################################################
+{%- if salt is defined and grains is defined %}
+    {%- set firewalld=salt['grains.filter_by'](firewalld, merge=salt['pillar.get']('firewalld',{}),base='firewalld') %}
+    {%- set golang = salt['grains.filter_by']( golang, merge=salt['pillar.get']('golang', {}), base='golang') %}
+    {%- set etcd = salt['grains.filter_by']( etcd, merge=salt['pillar.get']('etcd', {}), base='etcd') %}
+    {%- set ceph = salt['grains.filter_by']( ceph, merge=salt['pillar.get']('ceph', {}), base='ceph') %}
+    {%- set docker = salt['grains.filter_by']( docker, merge=salt['pillar.get']('docker', {}), base='docker') %}
+    {%- set devstack = salt['grains.filter_by']( devstack, merge=salt['pillar.get']('devstack', {}), base='devstack')%}
+    {%- set packages = salt['grains.filter_by']( packages, merge=salt['pillar.get']('packages', {}), base='packages')%}
+    {%- set resolver = salt['grains.filter_by']( resolver, merge=salt['pillar.get']('resolver', {}), base='resolver')%}
+{%- elif ansible is defined %}
+    {# I need to study how to do this in Ansible #}
+{%- endif %}
+
+# The following python dicts are exported:
+#     firewalld, golang, etcd, docker, ceph, packages, resolver, and soda.
+
+# Salt states or Ansible roles can import them to install SODA.

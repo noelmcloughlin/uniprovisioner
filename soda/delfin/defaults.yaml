@@ -1,0 +1,36 @@
+### soda/delfin/defaults.yaml
+# vim: sts=2 ts=2 sw=2 et ai
+
+soda:
+  supported:
+    - delfin
+  wanted:
+    - delfin
+  pkg:
+    delfin:
+      cmd:
+        - delfin
+  endpoint:
+    delfin:
+      ipv4: 127.0.0.1     # default
+      port: 1234          # default
+  container:
+    delfin:
+      image: sodafoundation/delfin      # dockerhub
+      version: latest 
+      env:
+        DELFIN_RABBITMQ_USER: delfinuser
+        DELFIN_RABBITMQ_PASS: delfinpass
+        DELFIN_HOST_IP: 127.0.0.1
+  daemon:
+    delfin:
+      strategy: container               # or 'gitrepo'
+      gitrepo:
+        url: https://github.com/sodafoundation/delfin.git
+        branch: master
+        build_cmd: installer/install -s
+        build_subdir: ''
+        binaries_subdir: ''        # usually '/build/out/bin' with golang
+        clean_cmd: ''
+      start: /usr/local/bin/delfin     # systemd start
+      stop: /usr/bin/killall delfin    # systemd stop

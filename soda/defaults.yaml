@@ -83,6 +83,12 @@ soda:
       TasksMax: infinity
       TasksAccounting: false
 
+  host: 127.0.0.1
   dir: '/'
   makefile:
     platform: 'debian:stretch'
+  cmd:
+    docker_compose: /usr/bin/docker-compose
+
+  misc:
+    force_clone: true

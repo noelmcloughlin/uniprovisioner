@@ -1,4 +1,4 @@
 # uniprovisioner
 Universal Provisioner
 
-Provision SODA experiments
+Provision SODA experimental prototyping
